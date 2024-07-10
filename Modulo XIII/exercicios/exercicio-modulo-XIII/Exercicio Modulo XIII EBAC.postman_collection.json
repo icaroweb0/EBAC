@@ -51,7 +51,7 @@
 			"response": []
 		},
 		{
-			"name": "Buscar usuário por ID",
+			"name": "Buscar usuário por ID - Sucesso",
 			"event": [
 				{
 					"listen": "test",
@@ -60,9 +60,56 @@
 							"pm.test(\"Usuário encontrado\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"",
+							"pm.test(\"Cada objeto no array deve conter nome, email, password, administrador e _id\", function () {",
+							"    const responseJson = pm.response.json();",
+							"    pm.expect(responseJson).to.be.an('object').that.has.all.keys('nome', 'email', 'password', 'administrador', '_id');",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Defina o id de usuário que deseja buscar",
+							"let id = \"szVu4QpcKthCEbqO\";",
+							"pm.collectionVariables.set(\"userId\", id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{usuarios}}/{{userId}}",
+					"host": [
+						"{{usuarios}}"
+					],
+					"path": [
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Buscar usuário por ID - Falha usuario nao encontrado",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
 							"pm.test(\"Usuário não encontrado\", function () {",
 							"    pm.response.to.have.status(400);",
+							"});",
+							"pm.test(\"Usuário não encontrado\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Usuário não encontrado\");",
 							"});"
 						],
 						"type": "text/javascript",
@@ -98,7 +145,7 @@
 			"response": []
 		},
 		{
-			"name": "Cadastrar usuario",
+			"name": "Cadastrar usuario - Sucesso",
 			"event": [
 				{
 					"listen": "test",
@@ -111,49 +158,58 @@
 							"pm.test(\"Cadastro com sucesso\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");",
 							"});",
-							"",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nome\": \"Francisco Chagas JR\",\n  \"email\": \"chachiquinho@qa.com.br\",\n  \"password\": \"teste\",\n  \"administrador\": \"false\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{usuarios}}",
+					"host": [
+						"{{usuarios}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastrar usuario - Falha Email já cadastrado",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
 							"pm.test(\"E-mail já cadastrado\", function () {",
 							"    pm.response.to.have.status(400);",
 							"});",
 							"",
 							"pm.test(\"Email já cadastrado\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Este email já está sendo usado\");",
-							"});",
-							"var template = `",
-							"<style type=\"text/css\">",
-							"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
-							"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
-							"    .tftable tr {background-color:#ffffff;}",
-							"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
-							"    .tftable tr:hover {background-color:#e0ffff;}",
-							"</style>",
-							"",
-							"<table class=\"tftable\" border=\"1\">",
-							"    <tr>",
-							"        <th>Nome</th>",
-							"        <th>Email</th>",
-							"        <th>Password</th>",
-							"        <th>Administrador</th>",
-							"        <th>ID</th>",
-							"    </tr>",
-							"    ",
-							"    {{#each response.usuarios}}",
-							"        <tr id=row_{{@key}}>",
-							"            <td>{{nome}}</td>",
-							"            <td>{{email}}</td>",
-							"            <td>{{password}}</td>",
-							"            <td>{{administrador}}</td>",
-							"            <td>{{_id}}</td>",
-							"        </tr>",
-							"    {{/each}}",
-							"</table>",
-							"`;",
-							"",
-							"function constructVisualizerPayload() {",
-							"    return {response: pm.response.json()}",
-							"}",
-							"",
-							"pm.visualizer.set(template, constructVisualizerPayload());"
+							"});"
 						],
 						"type": "text/javascript",
 						"packages": {}
@@ -182,7 +238,7 @@
 			"response": []
 		},
 		{
-			"name": "Excluir usuário",
+			"name": "Excluir usuário - Sucesso",
 			"event": [
 				{
 					"listen": "test",
@@ -194,14 +250,6 @@
 							"",
 							"pm.test(\"Registro excluído com sucesso\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");",
-							"});",
-							"",
-							"pm.test(\"Nenhum registro excluído\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Nenhum registro excluído\");",
-							"});",
-							"",
-							"pm.test(\"Usuário com carrinho cadastrado\", function () {",
-							"    pm.response.to.have.status(400);",
 							"});"
 						],
 						"type": "text/javascript",
@@ -213,7 +261,7 @@
 					"script": {
 						"exec": [
 							"// Defina o id de usuário que deseja excluir",
-							"let id = \"C6sPnYqKCN6ce5LO\";",
+							"let id = \"zbQhOCHod6KDBsvs\";",
 							"pm.collectionVariables.set(\"userId\", id);"
 						],
 						"type": "text/javascript",
@@ -237,7 +285,102 @@
 			"response": []
 		},
 		{
-			"name": "Editar usuário",
+			"name": "Excluir usuário - Falha sem item",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Nenhum registro excluído\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Nenhum registro excluído\");",
+							"});",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Defina o id de usuário que deseja excluir",
+							"let id = \"zbQhOCHod6KDBsvs\";",
+							"pm.collectionVariables.set(\"userId\", id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{usuarios}}/{{userId}}",
+					"host": [
+						"{{usuarios}}"
+					],
+					"path": [
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Excluir usuário - Falha usuário com item no carrinho",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code 400\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Não é permitido excluir usuário com carrinho cadastrado\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Não é permitido excluir usuário com carrinho cadastrado\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Defina o id de usuário que deseja excluir",
+							"let id = \"0uxuPY0cbmQhpEz1\";",
+							"pm.collectionVariables.set(\"userId\", id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{usuarios}}/{{userId}}",
+					"host": [
+						"{{usuarios}}"
+					],
+					"path": [
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Editar usuário - Sucesso",
 			"event": [
 				{
 					"listen": "test",
@@ -246,11 +389,63 @@
 							"pm.test(\"Alterado com sucesso\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
+							"pm.test(\"Registro alterado com sucesso\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Registro alterado com sucesso\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Defina o id de usuário que deseja editar",
+							"let id = \"EnjKu71hQf3rYri3\";",
+							"pm.collectionVariables.set(\"userId\", id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nome\": \"Shaolin matador de porco\",\n  \"email\": \"shaolinmatadordeporco@qa.com.br\",\n  \"password\": \"teste123\",\n  \"administrador\": \"true\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{usuarios}}/{{userId}}",
+					"host": [
+						"{{usuarios}}"
+					],
+					"path": [
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Editar usuário - Sucesso cadastro",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
 							"pm.test(\"Cadastro com sucesso\", function () {",
 							"    pm.response.to.have.status(201);",
 							"});",
-							"pm.test(\"Este email já está sendo usado\", function () {",
-							"    pm.response.to.have.status(400);",
+							"pm.test(\"Cadastro realizado com sucesso\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");",
 							"});"
 						],
 						"type": "text/javascript",
@@ -275,7 +470,63 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"nome\": \"Fulano da Silva\",\n  \"email\": \"beltrano@qa.com.br\",\n  \"password\": \"teste\",\n  \"administrador\": \"true\"\n}",
+					"raw": "{\n  \"nome\": \"Shaolin matador de porco\",\n  \"email\": \"shaolin@qa.com.br\",\n  \"password\": \"teste\",\n  \"administrador\": \"false\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{usuarios}}/{{userId}}",
+					"host": [
+						"{{usuarios}}"
+					],
+					"path": [
+						"{{userId}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Editar usuário - Falha Email já cadastrado",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Este email já está sendo usado\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"pm.test(\"Este email já está sendo usado\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Este email já está sendo usado\");",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Defina o id de usuário que deseja editar",
+							"let id = \"0uxuPY0cbmQhpEz1\";",
+							"pm.collectionVariables.set(\"userId\", id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"nome\": \"Fulano da Silva\",\n  \"email\": \"beltrano@qa.com.br\",\n  \"password\": \"teste123\",\n  \"administrador\": \"true\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
